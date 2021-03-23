@@ -1,4 +1,4 @@
-service: serverlss-etl-sample
+service: serverless-etl-sample
 
 useDotenv: true
 
@@ -15,7 +15,7 @@ provider:
   apiName: ${self:custom.appName}
   lambdaHashingVersion: 20201221
   deploymentBucket:
-    name: ${cf:${self:custom.appName}-resouces.ServerlessDeploymentBucketName}
+    name: ${cf:${self:custom.appName}-resources.ServerlessDeploymentBucketName}
   iam:
     role:
       statement:
@@ -36,10 +36,10 @@ provider:
             - s3:ListBucket
             - s3:PutObject
           Resource:
-            - arn:aws:s3:::${self:custom.appName}-devices-raw-data-#{AWS::AccountId}-#{AWS::Region}
-            - arn:aws:s3:::${self:custom.appName}-devices-raw-data-#{AWS::AccountId}-#{AWS::Region}/*
-            - arn:aws:s3:::${self:custom.appName}-data-analytics-#{AWS::AccountId}-#{AWS::Region}
-            - arn:aws:s3:::${self:custom.appName}-data-analytics-#{AWS::AccountId}-#{AWS::Region}/*
+            - arn:aws:s3:::devices-raw-data-#{AWS::AccountId}-#{AWS::Region}
+            - arn:aws:s3:::devices-raw-data-#{AWS::AccountId}-#{AWS::Region}/*
+            - arn:aws:s3:::devices-data-analytics-#{AWS::AccountId}-#{AWS::Region}
+            - arn:aws:s3:::devices-data-analytics-#{AWS::AccountId}-#{AWS::Region}/*
   tracing:
     apiGateway: true
     lambda: true
@@ -47,11 +47,11 @@ provider:
     LOG_LEVEL: DEBUG
     POWERTOOLS_SERVICE_NAME: ${self:custom.appName}
     DEVICES_TABLE_NAME: Devices
-    DEVICES_RAW_DATA_BUCKET_NAME: ${cf:${self:custom.appName}-s3.DevicesRawDataBucketName}
-    DEVICES_DATA_ANALYTICS_BUCKET_NAME: ${cf:${self:custom.appName}-s3.DevicesDataAnalyticsBucketName}
+    DEVICES_RAW_DATA_BUCKET_NAME: ${cf:${self:custom.appName}-resources.DevicesRawDataBucketName}
+    DEVICES_DATA_ANALYTICS_BUCKET_NAME: ${cf:${self:custom.appName}-resources.DevicesDataAnalyticsBucketName}
 
 custom:
-  appName: serverlss-etl-sample
+  appName: serverless-etl-sample
   defaultStage: dev
   pythonRequirements:
     dockerizePip: true
@@ -68,6 +68,8 @@ package:
     - README.md
     - pyrightconfig.json
     - package**
+    - scripts/**
+    - sample/**
     - Pipfile**
     - node_modules/**
 

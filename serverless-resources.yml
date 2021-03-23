@@ -1,4 +1,4 @@
-service: serverlss-etl-sample-resources
+service: serverless-etl-sample-resources
 
 provider:
   name: aws
@@ -6,7 +6,7 @@ provider:
   stage: ${opt:stage, self:custom.defaultStage}
   stackName: ${self:custom.appName}-resources
 custom:
-  appName: serverlss-etl-sample
+  appName: serverless-etl-sample
   defaultStage: dev
 
 resources:
