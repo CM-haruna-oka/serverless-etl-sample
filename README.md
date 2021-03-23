@@ -3,6 +3,12 @@
 
 ## インストール
 
+Serverless Frameworkが入っていない場合はインストールしてください。
+
+```
+$ npm -g i serverless
+```
+
 依存ライブラリのインストール
 
 ```
@@ -11,11 +17,7 @@ $ pipenv install --dev
 $ npm install (slsのプラグインをインストール)
 ```
 
-Serverless Frameworkが入っていない場合はインストールしてください。
 
-```
-$ npm -g i serverless
-```
 ## デプロイ
 
 ```
@@ -26,5 +28,7 @@ $ sls deploy
 ## サンプルデータ投入
 
 ```
-python scripts/set_sample_data.py
+$ python scripts/set_sample_data.py
+$ aws s3 cp sample/devices-raw-data.json s3://devices-raw-data-999999999999-ap-northeast-1/
+(アカウントID部分を書き換えてください)
 ```
