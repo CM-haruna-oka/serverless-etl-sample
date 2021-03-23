@@ -1,0 +1,8 @@
+{
+    "data": [
+        {"device_id": "device_u33nk7yy", "timestamp": "1616506124", "power": "on"},
+        {"device_id": "device_m6mww3ss", "timestamp": "1616506165", "power": "on"},
+        {"device_id": "device_u33nk7yy", "timestamp": "1616506185", "power": "off"},
+        {"device_id": "device_sd7ubc8s", "timestamp": "1616506197", "power": "off"}
+    ]
+}
