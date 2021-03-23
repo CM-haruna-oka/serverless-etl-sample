@@ -1,0 +1,116 @@
+service: serverlss-etl-sample
+
+useDotenv: true
+
+plugins:
+  - serverless-python-requirements
+  - serverless-pseudo-parameters
+  - serverless-step-functions
+provider:
+  name: aws
+  region: ap-northeast-1
+  stage: ${opt:stage, self:custom.defaultStage}
+  runtime: python3.8
+  stackName: ${self:custom.appName}
+  apiName: ${self:custom.appName}
+  lambdaHashingVersion: 20201221
+  deploymentBucket:
+    name: ${cf:${self:custom.appName}-resouces.ServerlessDeploymentBucketName}
+  iam:
+    role:
+      statement:
+        - Effect: Allow
+          Action:
+            - dynamodb:PutItem
+            - dynamodb:DeleteItem
+            - dynamodb:GetItem
+            - dynamodb:Scan
+            - dynamodb:Query
+            - dynamodb:UpdateItem
+          Resource:
+            - arn:aws:dynamodb:#{AWS::Region}:#{AWS::AccountId}:table/Devices
+        - Effect: Allow
+          Action:
+            - s3:GetObject
+            - s3:headObject
+            - s3:ListBucket
+            - s3:PutObject
+          Resource:
+            - arn:aws:s3:::${self:custom.appName}-devices-raw-data-#{AWS::AccountId}-#{AWS::Region}
+            - arn:aws:s3:::${self:custom.appName}-devices-raw-data-#{AWS::AccountId}-#{AWS::Region}/*
+            - arn:aws:s3:::${self:custom.appName}-data-analytics-#{AWS::AccountId}-#{AWS::Region}
+            - arn:aws:s3:::${self:custom.appName}-data-analytics-#{AWS::AccountId}-#{AWS::Region}/*
+  tracing:
+    apiGateway: true
+    lambda: true
+  environment:
+    LOG_LEVEL: DEBUG
+    POWERTOOLS_SERVICE_NAME: ${self:custom.appName}
+    DEVICES_TABLE_NAME: Devices
+    DEVICES_RAW_DATA_BUCKET_NAME: ${cf:${self:custom.appName}-s3.DevicesRawDataBucketName}
+    DEVICES_DATA_ANALYTICS_BUCKET_NAME: ${cf:${self:custom.appName}-s3.DevicesDataAnalyticsBucketName}
+
+custom:
+  appName: serverlss-etl-sample
+  defaultStage: dev
+  pythonRequirements:
+    dockerizePip: true
+    slim: true
+    usePipenv: true
+    layer: true
+
+package:
+  individually: true
+  exclude:
+    - .git/**
+    - .venv/**
+    - tests/**
+    - README.md
+    - pyrightconfig.json
+    - package**
+    - Pipfile**
+    - node_modules/**
+
+functions:
+  LoadFile:
+    name: load_file
+    handler: src/handlers/load_file.handler
+    description: "ファイルロード"
+    layers:
+      - !Ref PythonRequirementsLambdaLayer
+  DataJoin:
+    name: data_join
+    handler: src/handlers/data_join.handler
+    description: "データ結合"
+    layers:
+      - !Ref PythonRequirementsLambdaLayer
+
+stepFunctions:
+  stateMachines:
+    BatchStateMachine:
+      name: BatchStateMachine
+      definition:
+        Comment: Load the raw data file
+        StartAt: LoadFile
+        States:
+          LoadFile:
+            Type: Task
+            Resource: !GetAtt LoadFile.Arn
+            Next: FileExists
+          FileExists:
+            Type: Choice
+            Choices:
+              - Variable: "$.file_exist"
+                StringEquals: "true"
+                Next: DataJoin
+              - Variable: "$.file_exist"
+                StringEquals: "false"
+                Next: NoFile
+            Default: DataJoin
+          NoFile:
+            Type: Pass
+            End: true
+          DataJoin:
+            Type: Task
+            Resource: !GetAtt DataJoin.Arn
+            End: true

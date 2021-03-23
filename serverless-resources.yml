@@ -1,0 +1,43 @@
+service: serverlss-etl-sample-resources
+
+provider:
+  name: aws
+  region: ap-northeast-1
+  stage: ${opt:stage, self:custom.defaultStage}
+  stackName: ${self:custom.appName}-resources
+custom:
+  appName: serverlss-etl-sample
+  defaultStage: dev
+
+resources:
+  Resources:
+    DeviceTable:
+      Type: "AWS::DynamoDB::Table"
+      Properties:
+        TableName: Devices
+        AttributeDefinitions:
+          - AttributeName: user_id
+            AttributeType: S
+          - AttributeName: device_id
+            AttributeType: S
+        KeySchema:
+          - AttributeName: user_id
+            KeyType: HASH
+          - AttributeName: device_id
+            KeyType: RANGE
+        BillingMode: PAY_PER_REQUEST
+    DevicesRawDataBucket:
+      Type: AWS::S3::Bucket
+      Properties:
+        BucketName: !Sub devices-raw-data-${AWS::AccountId}-${AWS::Region}
+    DevicesDataAnalyticsBucket:
+      Type: AWS::S3::Bucket
+      Properties:
+        BucketName: !Sub devices-data-analytics-${AWS::AccountId}-${AWS::Region}
+  Outputs:
+    DevicesRawDataBucketName:
+      Description: S3 Bucket for devices raw data
+      Value: !Ref DevicesRawDataBucket
+    DevicesDataAnalyticsBucketName:
+      Description: S3 Bucket for analytics data
+      Value: !Ref DevicesDataAnalyticsBucket

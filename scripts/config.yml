@@ -1,0 +1,11 @@
+---
+devices:
+  - device_id: device_u33nk7yy
+    user_id: user_0001
+    type: TV
+  - device_id: device_m6mww3ss
+    user_id: user_0001
+    type: エアコン
+  - device_id: device_sd7ubc8s
+    user_id: user_0002
+    type: TV
