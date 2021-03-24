@@ -23,11 +23,11 @@ def handler(event, context: LambdaContext):
         logger.warn(e)
         logger.info('File Not Exist.')
         
-        return {'file_exist': 'false'}
+        return {'file_exist': False}
 
     logger.info('File Exist.')
     
     return {
-        'file_exist': 'true',
+        'file_exist': True,
         'bucket_name': DEVICES_RAW_DATA_BUCKET_NAME,
         's3_object_key': key}

@@ -103,10 +103,10 @@ stepFunctions:
             Type: Choice
             Choices:
               - Variable: "$.file_exist"
-                StringEquals: "true"
+                IsBoolean: true
                 Next: DataJoin
               - Variable: "$.file_exist"
-                StringEquals: "false"
+                IsBoolean: false
                 Next: NoFile
             Default: DataJoin
           NoFile:
