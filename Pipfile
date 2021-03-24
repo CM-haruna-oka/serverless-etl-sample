@@ -8,6 +8,7 @@ pylint = "*"
 autopep8 = "*"
 pytest = "*"
 moto = "*"
+pyyaml = "*"
 
 [packages]
 aws-lambda-powertools = "*"
